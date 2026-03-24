@@ -296,13 +296,13 @@ export default function FlowDV1Screen() {
         />
       )}
 
-      {/* Back button — fixed at top */}
-      <Animated.View style={[styles.fixedBackButton, { opacity: backOpacity }]}>
-        <BackButton onPress={handleBack} />
-      </Animated.View>
-
       {/* Scrollable page content */}
-      <ScrollView style={{ flex: 1, zIndex: 1 }} contentContainerStyle={{ paddingTop: 86, paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
+      <ScrollView style={{ flex: 1, zIndex: 1 }} contentContainerStyle={{ paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
+        {/* Back button — scrolls with content */}
+        <Animated.View style={{ opacity: backOpacity }}>
+          <BackButton onPress={handleBack} />
+        </Animated.View>
+
         {/* Menu + Speech bubble */}
         <View style={styles.conversationRow}>
           <MenuButton />
@@ -385,13 +385,6 @@ const styles = StyleSheet.create({
   conversationBubbleWrap: {
     flex: 1,
   },
-  fixedBackButton: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-  },
   responseContainer: {
     gap: 20,
   },
@@ -448,5 +441,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    zIndex: 20,
   },
 });

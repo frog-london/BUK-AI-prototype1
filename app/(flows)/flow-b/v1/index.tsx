@@ -818,9 +818,9 @@ export default function FlowBV1Screen() {
         <Nav2 activeIndex={activeTab} onTabPress={setActiveTab} />
       </Animated.View>
 
-      {/* ═══ SEARCH: BackButton — fixed at top ═══ */}
-      {showSearch && (
-        <Animated.View renderToHardwareTextureAndroid style={[styles.fixedBackButton, { opacity: searchBackOpacity }]}>
+      {/* ═══ SEARCH: BackButton ═══ */}
+      {showSearch && !isConversation && (
+        <Animated.View renderToHardwareTextureAndroid style={{ opacity: searchBackOpacity }}>
           <BackButton onPress={animateToHome} />
         </Animated.View>
       )}
@@ -839,7 +839,11 @@ export default function FlowBV1Screen() {
 
       {/* ═══ SEARCH: Scrollable conversation + response ═══ */}
       {showSearch && isConversation && (
-        <ScrollView style={{ flex: 1, zIndex: 1 }} contentContainerStyle={{ paddingTop: 86, paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{ flex: 1, zIndex: 1 }} contentContainerStyle={{ paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
+          {/* BackButton scrolls with content */}
+          <Animated.View renderToHardwareTextureAndroid style={{ opacity: searchBackOpacity }}>
+            <BackButton onPress={animateToHome} />
+          </Animated.View>
           {/* Menu + Conversation bubble */}
           <View style={styles.conversationRow}>
             <MenuButton />
@@ -916,13 +920,9 @@ export default function FlowBV1Screen() {
             <VoiceVisualiser scale={voiceScale} thinking={isThinking} />
           </View>
 
-          {/* BackButton — fixed at top */}
-          <View style={[styles.fixedBackButton, { backgroundColor: '#F5F5F5' }]}>
-            <BackButton onPress={animateFromVoice} />
-          </View>
-
           {/* Scrollable content */}
           <ScrollView style={styles.voiceScrollView} contentContainerStyle={styles.voiceScrollContent} showsVerticalScrollIndicator={false}>
+            <BackButton onPress={animateFromVoice} />
 
             {/* Finalized transcript as speech bubble */}
             {transcript ? (
@@ -1104,6 +1104,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    zIndex: 20,
   },
   searchSuggestionsRow: {
     paddingVertical: 16,
@@ -1117,13 +1118,6 @@ const styles = StyleSheet.create({
   },
   conversationBubbleWrap: {
     flex: 1,
-  },
-  fixedBackButton: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
   },
   responseContainer: {
     marginTop: 20,
@@ -1153,7 +1147,6 @@ const styles = StyleSheet.create({
   },
   voiceScrollContent: {
     flexGrow: 1,
-    paddingTop: 86,
     paddingBottom: 200,
   },
   voiceMenuWrap: {
