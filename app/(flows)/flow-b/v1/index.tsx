@@ -1000,7 +1000,13 @@ export default function FlowBV1Screen() {
             >
               {!hasQuery && (
                 <View style={styles.searchSuggestionsRow}>
-                  <Suggestions onSelect={(label) => setQuery(label)} />
+                  <Suggestions onSelect={(label) => {
+                    if (label === 'Send money to Sam P.') {
+                      router.push('/(flows)/flow-d/v1');
+                    } else {
+                      setQuery(label);
+                    }
+                  }} />
                 </View>
               )}
             </Animated.View>

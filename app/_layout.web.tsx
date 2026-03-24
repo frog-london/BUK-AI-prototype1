@@ -1,15 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Dimensions, View, StyleSheet } from 'react-native';
-import { Stack, useSegments } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
 SplashScreen.preventAutoHideAsync();
 
-// Device presets
-const PHONE   = { w: 412,  h: 923  };   // Pixel 9 Pro
-const WATCH   = { w: 410,  h: 502  };   // Apple Watch Ultra
-const DESKTOP = { w: 1920, h: 1080 };   // 1080p landscape
+// Fixed phone frame for desktop browsers
+const PHONE = { w: 412, h: 923 };
+
+// Threshold: viewports at or below this width go full-screen
+const MOBILE_BREAKPOINT = 500;
 
 // Mutable ref for Dimensions monkey-patch
 const deviceRef = { w: PHONE.w, h: PHONE.h };
@@ -21,12 +22,22 @@ Dimensions.get = (dim: 'window' | 'screen') => {
 };
 
 export default function RootLayout() {
-  const segments = useSegments();
-  const isWatch   = segments.includes('flow-w' as never);
-  const isDesktop = segments.includes('flow-i' as never);
-  const device = isDesktop ? DESKTOP : isWatch ? WATCH : PHONE;
+  const [viewport, setViewport] = useState({
+    w: window.innerWidth,
+    h: window.innerHeight,
+  });
 
-  // Keep monkey-patch in sync with current route
+  useEffect(() => {
+    const onResize = () =>
+      setViewport({ w: window.innerWidth, h: window.innerHeight });
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const isMobile = viewport.w <= MOBILE_BREAKPOINT;
+  const device = isMobile ? viewport : PHONE;
+
+  // Keep monkey-patch in sync
   deviceRef.w = device.w;
   deviceRef.h = device.h;
 
@@ -38,10 +49,10 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    document.documentElement.style.backgroundColor = '#1a1a1a';
+    document.documentElement.style.backgroundColor = isMobile ? '#000' : '#1a1a1a';
     document.body.style.margin = '0';
     document.body.style.overflow = 'hidden';
-  }, []);
+  }, [isMobile]);
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -54,14 +65,13 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={styles.outer}>
+    <View style={[styles.outer, !isMobile && styles.outerDesktop]}>
       <View
         style={[
           styles.device,
-          {
-            width: device.w,
-            height: device.h,
-          },
+          isMobile
+            ? styles.deviceMobile
+            : { width: device.w, height: device.h },
         ]}
       >
         <Stack screenOptions={{ headerShown: false }}>
@@ -76,11 +86,16 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   outer: {
     flex: 1,
+  },
+  outerDesktop: {
     backgroundColor: '#1a1a1a',
     alignItems: 'center',
     justifyContent: 'center',
   },
   device: {
     overflow: 'hidden',
+  },
+  deviceMobile: {
+    flex: 1,
   },
 });
