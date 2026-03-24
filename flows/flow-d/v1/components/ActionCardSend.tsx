@@ -322,7 +322,7 @@ export function ActionCardSend({
                 border: 'none',
                 background: 'transparent',
                 fontSize: '16px',
-                caretColor: isEditMode ? '#06015D' : 'transparent',
+                caretColor: 'transparent',
                 outline: 'none',
                 zIndex: 10,
               }}
