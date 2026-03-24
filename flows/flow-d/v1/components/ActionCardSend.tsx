@@ -182,9 +182,11 @@ export function ActionCardSend({
         setEditValue(whole);
         setTypedDecCount(0);
       }
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
+      // On native, the input may need a tick to mount before focusing
+      if (Platform.OS !== 'web') {
+        setTimeout(() => inputRef.current?.focus(), 100);
+      }
+      // On web, focus is triggered synchronously from the tap handler (see amount row)
     }
   }, [variant]);
 
@@ -279,7 +281,12 @@ export function ActionCardSend({
               </TouchableOpacity>
             </Animated.View>
             <TouchableOpacity
-              onPress={onAmountPress}
+              onPress={() => {
+                // Focus the always-mounted hidden input synchronously within
+                // the tap gesture so mobile browsers open the keyboard
+                if (Platform.OS === 'web') inputRef.current?.focus();
+                onAmountPress?.();
+              }}
               activeOpacity={0.7}
               style={styles.amountTouchable}
             >
@@ -291,6 +298,18 @@ export function ActionCardSend({
                 <IconPlusCircle width={31} height={31} />
               </TouchableOpacity>
             </Animated.View>
+            {/* Hidden input always mounted so focus() works synchronously on mobile web */}
+            {Platform.OS === 'web' && (
+              <TextInput
+                ref={inputRef}
+                style={styles.hiddenInput}
+                value={editValue}
+                onChangeText={handleChangeText}
+                onBlur={handleBlur}
+                keyboardType="decimal-pad"
+                caretHidden
+              />
+            )}
           </View>
         ) : displayStep === 'send' && isEditMode ? (
           <View style={styles.amountRowEditWrap}>
@@ -460,6 +479,13 @@ const styles = StyleSheet.create({
   amountRowEditWrap: {
     width: '100%',
     alignItems: 'center',
+  },
+  hiddenInput: {
+    position: 'absolute',
+    opacity: 0,
+    width: 1,
+    height: 1,
+    pointerEvents: 'none',
   },
   amountEditInputOverlay: {
     ...effra('500'),

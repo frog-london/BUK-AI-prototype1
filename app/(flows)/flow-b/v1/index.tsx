@@ -910,59 +910,65 @@ export default function FlowBV1Screen() {
       {/* ═══ VOICE: Listening screen ═══ */}
       {showVoice && (
         <Animated.View style={[styles.voiceContainer, { opacity: voiceOpacity }]}>
-          <BackButton onPress={animateFromVoice} />
-
-          {/* Finalized transcript as speech bubble */}
-          {transcript ? (
-            <View style={styles.conversationRow}>
-              <MenuButton />
-              <Animated.View style={[styles.conversationBubbleWrap, { opacity: voiceBubbleOpacity }]}>
-                <SpeechBubble text={transcript} />
-              </Animated.View>
-            </View>
-          ) : (
-            <View style={styles.voiceMenuWrap}>
-              <MenuButton />
-            </View>
-          )}
-
-          {/* Interim text or listening indicator */}
-          {interimTranscript ? (
-            <View style={styles.transcriptContainer}>
-              <AnimatedWords text={interimTranscript} style={styles.interimText} />
-            </View>
-          ) : !transcript && messageCount === 0 ? (
-            <View style={styles.listeningContainer} pointerEvents="none">
-              <Text style={styles.listeningText}>Listening...</Text>
-            </View>
-          ) : null}
-
-          {/* AI response after thinking */}
-          {showVoiceResponse && !interimTranscript && (
-            <Animated.View style={{ opacity: voiceResponseOpacity, paddingTop: 30 }}>
-              {voiceAnswerIndex === 0 ? (
-                <VoiceResponse
-                  key="answer-0"
-                  text="Let's get this sorted immediately. I'll start by looking at your transactions."
-                  indicator={<LoadIndicator />}
-                  indicatorDuration={4000}
-                  secondText={"Good news \u2014 nothing else looks out of the ordinary. I\u2019ve checked your last 90 days of transactions and this is the only payment to Clear Web Solutions on your account. No repeat charges, no linked payments.\n\nWould you like me to connect you to a Barclays specialist?"}
-                />
-              ) : (
-                <VoiceResponse
-                  key="answer-1"
-                  text="I've put together a summary, you won't need to repeat yourself."
-                  indicator={<LoadIndicator text="Connecting you to a specialist..." />}
-                  indicatorDuration={4000}
-                  card={<View style={{ gap: 14 }}><WaitCard /><HandoverCard /></View>}
-                />
-              )}
-            </Animated.View>
-          )}
-
+          {/* Gradient background — behind everything */}
           <View style={styles.voiceVisualiserWrap}>
             <VoiceVisualiser scale={voiceScale} thinking={isThinking} />
           </View>
+
+          {/* Scrollable content */}
+          <ScrollView style={styles.voiceScrollView} contentContainerStyle={styles.voiceScrollContent} showsVerticalScrollIndicator={false}>
+            <BackButton onPress={animateFromVoice} />
+
+            {/* Finalized transcript as speech bubble */}
+            {transcript ? (
+              <View style={styles.conversationRow}>
+                <MenuButton />
+                <Animated.View style={[styles.conversationBubbleWrap, { opacity: voiceBubbleOpacity }]}>
+                  <SpeechBubble text={transcript} />
+                </Animated.View>
+              </View>
+            ) : (
+              <View style={styles.voiceMenuWrap}>
+                <MenuButton />
+              </View>
+            )}
+
+            {/* Interim text or listening indicator */}
+            {interimTranscript ? (
+              <View style={styles.transcriptContainer}>
+                <AnimatedWords text={interimTranscript} style={styles.interimText} />
+              </View>
+            ) : !transcript && messageCount === 0 ? (
+              <View style={styles.listeningContainer} pointerEvents="none">
+                <Text style={styles.listeningText}>Listening...</Text>
+              </View>
+            ) : null}
+
+            {/* AI response after thinking */}
+            {showVoiceResponse && !interimTranscript && (
+              <Animated.View style={{ opacity: voiceResponseOpacity, paddingTop: 30 }}>
+                {voiceAnswerIndex === 0 ? (
+                  <VoiceResponse
+                    key="answer-0"
+                    text="Let's get this sorted immediately. I'll start by looking at your transactions."
+                    indicator={<LoadIndicator />}
+                    indicatorDuration={4000}
+                    secondText={"Good news \u2014 nothing else looks out of the ordinary. I\u2019ve checked your last 90 days of transactions and this is the only payment to Clear Web Solutions on your account. No repeat charges, no linked payments.\n\nWould you like me to connect you to a Barclays specialist?"}
+                  />
+                ) : (
+                  <VoiceResponse
+                    key="answer-1"
+                    text="I've put together a summary, you won't need to repeat yourself."
+                    indicator={<LoadIndicator text="Connecting you to a specialist..." />}
+                    indicatorDuration={4000}
+                    card={<View style={{ gap: 14 }}><WaitCard /><HandoverCard /></View>}
+                  />
+                )}
+              </Animated.View>
+            )}
+          </ScrollView>
+
+          {/* Floating controls — above everything */}
           <View style={[styles.voiceControlsWrap, { paddingBottom: insets.bottom + 40 }]}>
             <VoiceControls isMuted={isMicMuted} onMicToggle={() => setIsMicMuted(m => !m)} onStop={animateFromVoice} />
           </View>
@@ -1133,6 +1139,13 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#F5F5F5',
   },
+  voiceScrollView: {
+    flex: 1,
+    zIndex: 1,
+  },
+  voiceScrollContent: {
+    paddingBottom: 200,
+  },
   voiceMenuWrap: {
     position: 'absolute',
     left: 30,
@@ -1178,6 +1191,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    zIndex: 0,
   },
   voiceControlsWrap: {
     position: 'absolute',
@@ -1185,5 +1199,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
+    zIndex: 2,
   },
 });
