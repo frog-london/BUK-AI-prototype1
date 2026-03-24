@@ -284,17 +284,27 @@ export function ActionCardSend({
               <View style={styles.amountTouchable}>
                 <Text style={styles.amountCurrency}>£</Text>
                 <Text style={styles.amountWhole}>{displayAmount}</Text>
-                {/* Transparent input overlays the amount so the native tap
-                    hits the <input> directly — iOS requires this to open the keyboard */}
-                <TextInput
-                  ref={inputRef}
-                  style={styles.amountTapOverlay}
+                {/* Raw HTML <input> so iOS sees a direct native tap and opens the keyboard.
+                    RNW's TextInput wraps the native input with touch handling that breaks
+                    the user gesture chain required by iOS to trigger the keyboard. */}
+                <input
+                  type="text"
+                  inputMode="decimal"
                   value={editValue}
-                  onChangeText={handleChangeText}
+                  onChange={(e: any) => handleChangeText(e.target.value)}
                   onFocus={() => onAmountPress?.()}
-                  onBlur={handleBlur}
-                  keyboardType="decimal-pad"
-                  caretHidden
+                  onBlur={() => handleBlur()}
+                  style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    width: '100%', height: '100%',
+                    opacity: 0,
+                    border: 'none',
+                    background: 'transparent',
+                    fontSize: '16px',
+                    caretColor: 'transparent',
+                    outline: 'none',
+                  }}
                 />
               </View>
             ) : (
@@ -481,15 +491,6 @@ const styles = StyleSheet.create({
   amountRowEditWrap: {
     width: '100%',
     alignItems: 'center',
-  },
-  amountTapOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    opacity: 0,
-    fontSize: 60,
   },
   amountEditInputOverlay: {
     ...effra('500'),

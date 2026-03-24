@@ -49,7 +49,7 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    document.documentElement.style.backgroundColor = isMobile ? '#012A45' : '#1a1a1a';
+    document.documentElement.style.backgroundColor = isMobile ? '#F5F5F5' : '#1a1a1a';
     document.body.style.margin = '0';
     document.body.style.overflow = 'hidden';
   }, [isMobile]);

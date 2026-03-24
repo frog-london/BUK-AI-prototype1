@@ -13,7 +13,8 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon-180.png" />
         <ScrollViewStyleReset />
         <style dangerouslySetInnerHTML={{ __html: `
-          html, body, #root { position: fixed; inset: 0; margin: 0; padding: 0; overflow: hidden; }
+          html { height: 100%; min-height: calc(100% + env(safe-area-inset-top)); }
+          body, #root { margin: 0; padding: 0; height: 100%; overflow: hidden; }
           input:focus, textarea:focus, [contenteditable]:focus { outline: none !important; box-shadow: none !important; }
         ` }} />
         <link rel="stylesheet" href="https://use.typekit.net/otb3sts.css" />
