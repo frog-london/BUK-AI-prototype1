@@ -296,26 +296,24 @@ export default function FlowDV1Screen() {
         />
       )}
 
-      {/* Back button */}
-      <Animated.View style={{ opacity: backOpacity }}>
+      {/* Back button — fixed at top */}
+      <Animated.View style={[styles.fixedBackButton, { opacity: backOpacity }]}>
         <BackButton onPress={handleBack} />
       </Animated.View>
 
-      {/* Menu + Speech bubble */}
-      <View style={styles.conversationRow}>
-        <MenuButton />
-        <Animated.View style={[styles.conversationBubbleWrap, { opacity: bubbleOpacity }]}>
-          <SpeechBubble text="Send money to Sam P." />
-        </Animated.View>
-      </View>
+      {/* Scrollable page content */}
+      <ScrollView style={{ flex: 1, zIndex: 1 }} contentContainerStyle={{ paddingTop: 86, paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
+        {/* Menu + Speech bubble */}
+        <View style={styles.conversationRow}>
+          <MenuButton />
+          <Animated.View style={[styles.conversationBubbleWrap, { opacity: bubbleOpacity }]}>
+            <SpeechBubble text="Send money to Sam P." />
+          </Animated.View>
+        </View>
 
-      {/* AI Response — text + card rendered separately */}
-      {showResponse && (
-        <View style={styles.responseContainer}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.responseScroll}
-          >
+        {/* AI Response — text + card rendered separately */}
+        {showResponse && (
+          <View style={[styles.responseContainer, { marginTop: 20 }]}>
             {/* Response text — always rendered for stable card position */}
             <Animated.View style={[styles.textContainer, { opacity: textOpacity }]}>
               <Text style={styles.responseText}>{displayedText || ' '}</Text>
@@ -352,9 +350,9 @@ export default function FlowDV1Screen() {
                 </TouchableOpacity>
               </Animated.View>
             )}
-          </ScrollView>
-        </View>
-      )}
+          </View>
+        )}
+      </ScrollView>
 
       {/* Search field at bottom */}
       <Animated.View
@@ -387,12 +385,14 @@ const styles = StyleSheet.create({
   conversationBubbleWrap: {
     flex: 1,
   },
-  responseContainer: {
-    flex: 1,
-    marginTop: 20,
+  fixedBackButton: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
   },
-  responseScroll: {
-    paddingBottom: 130,
+  responseContainer: {
     gap: 20,
   },
   textContainer: {

@@ -818,9 +818,9 @@ export default function FlowBV1Screen() {
         <Nav2 activeIndex={activeTab} onTabPress={setActiveTab} />
       </Animated.View>
 
-      {/* ═══ SEARCH: BackButton ═══ */}
+      {/* ═══ SEARCH: BackButton — fixed at top ═══ */}
       {showSearch && (
-        <Animated.View renderToHardwareTextureAndroid style={{ opacity: searchBackOpacity }}>
+        <Animated.View renderToHardwareTextureAndroid style={[styles.fixedBackButton, { opacity: searchBackOpacity }]}>
           <BackButton onPress={animateToHome} />
         </Animated.View>
       )}
@@ -837,74 +837,75 @@ export default function FlowBV1Screen() {
         </Animated.View>
       )}
 
-      {/* ═══ SEARCH: Menu + Conversation bubble ═══ */}
+      {/* ═══ SEARCH: Scrollable conversation + response ═══ */}
       {showSearch && isConversation && (
-        <View style={styles.conversationRow}>
-          <MenuButton />
-          <Animated.View
-            style={[styles.conversationBubbleWrap, { opacity: conversationOpacity }]}
-          >
-            <SpeechBubble text={submittedQuery} />
-          </Animated.View>
-        </View>
-      )}
+        <ScrollView style={{ flex: 1, zIndex: 1 }} contentContainerStyle={{ paddingTop: 86, paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
+          {/* Menu + Conversation bubble */}
+          <View style={styles.conversationRow}>
+            <MenuButton />
+            <Animated.View
+              style={[styles.conversationBubbleWrap, { opacity: conversationOpacity }]}
+            >
+              <SpeechBubble text={submittedQuery} />
+            </Animated.View>
+          </View>
 
-      {/* ═══ SEARCH: AI Response ═══ */}
-      {showSearch && isConversation && showResponse && (
-        <Animated.View needsOffscreenAlphaCompositing style={[styles.responseContainer, { opacity: responseOpacity }]}>
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.responseScroll}>
-            {conversationStep === 0 && (
-              <ResponseSection
-                text="I can help with that right now. Which card have you lost?"
-                cards={
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.accountCardsRow}
-                  >
-                    {ACCOUNT_CARDS.map((card, i) => (
-                      <ActionCardAccount
-                        key={i}
-                        image={card.image}
-                        name={card.name}
-                        lastFour={card.lastFour}
-                        onPress={() => handleCardSelect(card.displayName)}
-                      />
-                    ))}
-                  </ScrollView>
-                }
-                button={<ShowAllCardsButton />}
-              />
-            )}
-            {conversationStep === 1 && (
-              <ResponseSection
-                text="Would you like to freeze this card so it can't be used?"
-                subtitle="You can unfreeze it instantly if you find it."
-                cards={
-                  <View style={styles.freezeCardsRow}>
-                    <ActionCardFreeze
-                      icon={IconFreeze}
-                      label={'Yes, freeze\nthis card'}
-                      onPress={() => handleFreezeSelect('Yes, freeze this card')}
-                    />
-                    <ActionCardFreeze
-                      icon={IconNoFreeze}
-                      label={'No, do not\nfreeze this card'}
-                    />
-                  </View>
-                }
-              />
-            )}
-            {conversationStep === 2 && (
-              <View style={styles.frozenCardWrap}>
-                <FrozenCard
-                  cardName="Visa Debit"
-                  lastFour="4920"
+          {/* AI Response */}
+          {showResponse && (
+            <Animated.View needsOffscreenAlphaCompositing style={[styles.responseContainer, { opacity: responseOpacity }]}>
+              {conversationStep === 0 && (
+                <ResponseSection
+                  text="I can help with that right now. Which card have you lost?"
+                  cards={
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.accountCardsRow}
+                    >
+                      {ACCOUNT_CARDS.map((card, i) => (
+                        <ActionCardAccount
+                          key={i}
+                          image={card.image}
+                          name={card.name}
+                          lastFour={card.lastFour}
+                          onPress={() => handleCardSelect(card.displayName)}
+                        />
+                      ))}
+                    </ScrollView>
+                  }
+                  button={<ShowAllCardsButton />}
                 />
-              </View>
-            )}
-          </ScrollView>
-        </Animated.View>
+              )}
+              {conversationStep === 1 && (
+                <ResponseSection
+                  text="Would you like to freeze this card so it can't be used?"
+                  subtitle="You can unfreeze it instantly if you find it."
+                  cards={
+                    <View style={styles.freezeCardsRow}>
+                      <ActionCardFreeze
+                        icon={IconFreeze}
+                        label={'Yes, freeze\nthis card'}
+                        onPress={() => handleFreezeSelect('Yes, freeze this card')}
+                      />
+                      <ActionCardFreeze
+                        icon={IconNoFreeze}
+                        label={'No, do not\nfreeze this card'}
+                      />
+                    </View>
+                  }
+                />
+              )}
+              {conversationStep === 2 && (
+                <View style={styles.frozenCardWrap}>
+                  <FrozenCard
+                    cardName="Visa Debit"
+                    lastFour="4920"
+                  />
+                </View>
+              )}
+            </Animated.View>
+          )}
+        </ScrollView>
       )}
 
       {/* ═══ VOICE: Listening screen ═══ */}
@@ -915,9 +916,13 @@ export default function FlowBV1Screen() {
             <VoiceVisualiser scale={voiceScale} thinking={isThinking} />
           </View>
 
+          {/* BackButton — fixed at top */}
+          <View style={[styles.fixedBackButton, { backgroundColor: '#F5F5F5' }]}>
+            <BackButton onPress={animateFromVoice} />
+          </View>
+
           {/* Scrollable content */}
           <ScrollView style={styles.voiceScrollView} contentContainerStyle={styles.voiceScrollContent} showsVerticalScrollIndicator={false}>
-            <BackButton onPress={animateFromVoice} />
 
             {/* Finalized transcript as speech bubble */}
             {transcript ? (
@@ -1113,12 +1118,15 @@ const styles = StyleSheet.create({
   conversationBubbleWrap: {
     flex: 1,
   },
-  responseContainer: {
-    flex: 1,
-    marginTop: 77,
+  fixedBackButton: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
   },
-  responseScroll: {
-    paddingBottom: 130,
+  responseContainer: {
+    marginTop: 20,
   },
   accountCardsRow: {
     gap: 14,
@@ -1145,6 +1153,7 @@ const styles = StyleSheet.create({
   },
   voiceScrollContent: {
     flexGrow: 1,
+    paddingTop: 86,
     paddingBottom: 200,
   },
   voiceMenuWrap: {
