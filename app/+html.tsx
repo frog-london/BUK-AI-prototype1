@@ -10,6 +10,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="theme-color" content="#00AEEF" />
         <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/assets/icon.png" />
         <ScrollViewStyleReset />
         <style dangerouslySetInnerHTML={{ __html: `
           html, body, #root { height: 100%; margin: 0; }
