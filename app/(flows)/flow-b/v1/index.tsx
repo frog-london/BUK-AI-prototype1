@@ -1144,6 +1144,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   voiceScrollContent: {
+    flexGrow: 1,
     paddingBottom: 200,
   },
   voiceMenuWrap: {

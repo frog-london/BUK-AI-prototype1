@@ -11,7 +11,11 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <meta name="theme-color" content="#00AEEF" />
         <link rel="manifest" href="/manifest.json" />
         <ScrollViewStyleReset />
-        <style dangerouslySetInnerHTML={{ __html: `input:focus, textarea:focus, [contenteditable]:focus { outline: none !important; box-shadow: none !important; }` }} />
+        <style dangerouslySetInnerHTML={{ __html: `
+          html, body, #root { height: 100%; margin: 0; }
+          body { padding-bottom: env(safe-area-inset-bottom); box-sizing: border-box; }
+          input:focus, textarea:focus, [contenteditable]:focus { outline: none !important; box-shadow: none !important; }
+        ` }} />
         <link rel="stylesheet" href="https://use.typekit.net/otb3sts.css" />
         <script dangerouslySetInnerHTML={{ __html: `new MutationObserver(function(){document.querySelectorAll('video:not([playsinline])').forEach(function(v){v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');});}).observe(document.documentElement,{childList:true,subtree:true});` }} />
       </head>

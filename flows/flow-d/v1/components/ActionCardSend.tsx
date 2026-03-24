@@ -280,36 +280,38 @@ export function ActionCardSend({
                 <IconMinusCircle width={31} height={31} />
               </TouchableOpacity>
             </Animated.View>
-            <TouchableOpacity
-              onPress={() => {
-                // Focus the always-mounted hidden input synchronously within
-                // the tap gesture so mobile browsers open the keyboard
-                if (Platform.OS === 'web') inputRef.current?.focus();
-                onAmountPress?.();
-              }}
-              activeOpacity={0.7}
-              style={styles.amountTouchable}
-            >
-              <Text style={styles.amountCurrency}>£</Text>
-              <Text style={styles.amountWhole}>{displayAmount}</Text>
-            </TouchableOpacity>
+            {Platform.OS === 'web' ? (
+              <View style={styles.amountTouchable}>
+                <Text style={styles.amountCurrency}>£</Text>
+                <Text style={styles.amountWhole}>{displayAmount}</Text>
+                {/* Transparent input overlays the amount so the native tap
+                    hits the <input> directly — iOS requires this to open the keyboard */}
+                <TextInput
+                  ref={inputRef}
+                  style={styles.amountTapOverlay}
+                  value={editValue}
+                  onChangeText={handleChangeText}
+                  onFocus={() => onAmountPress?.()}
+                  onBlur={handleBlur}
+                  keyboardType="decimal-pad"
+                  caretHidden
+                />
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={onAmountPress}
+                activeOpacity={0.7}
+                style={styles.amountTouchable}
+              >
+                <Text style={styles.amountCurrency}>£</Text>
+                <Text style={styles.amountWhole}>{displayAmount}</Text>
+              </TouchableOpacity>
+            )}
             <Animated.View needsOffscreenAlphaCompositing style={{ opacity: plusMinusOpacity }}>
               <TouchableOpacity onPress={onIncrement} activeOpacity={0.7}>
                 <IconPlusCircle width={31} height={31} />
               </TouchableOpacity>
             </Animated.View>
-            {/* Hidden input always mounted so focus() works synchronously on mobile web */}
-            {Platform.OS === 'web' && (
-              <TextInput
-                ref={inputRef}
-                style={styles.hiddenInput}
-                value={editValue}
-                onChangeText={handleChangeText}
-                onBlur={handleBlur}
-                keyboardType="decimal-pad"
-                caretHidden
-              />
-            )}
           </View>
         ) : displayStep === 'send' && isEditMode ? (
           <View style={styles.amountRowEditWrap}>
@@ -480,12 +482,14 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
-  hiddenInput: {
+  amountTapOverlay: {
     position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     opacity: 0,
-    width: 1,
-    height: 1,
-    pointerEvents: 'none',
+    fontSize: 60,
   },
   amountEditInputOverlay: {
     ...effra('500'),

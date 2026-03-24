@@ -49,7 +49,7 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    document.documentElement.style.backgroundColor = isMobile ? '#000' : '#1a1a1a';
+    document.documentElement.style.backgroundColor = isMobile ? '#012A45' : '#1a1a1a';
     document.body.style.margin = '0';
     document.body.style.overflow = 'hidden';
   }, [isMobile]);
@@ -93,7 +93,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   device: {
-    overflow: 'hidden',
+    // @ts-ignore — web-only: 'clip' visually clips like 'hidden' but doesn't
+    // create a scroll container, so inner horizontal ScrollViews still work
+    overflow: 'clip',
   },
   deviceMobile: {
     flex: 1,
