@@ -10,11 +10,11 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="theme-color" content="#00AEEF" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/assets/icon.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon-180.png" />
         <ScrollViewStyleReset />
         <style dangerouslySetInnerHTML={{ __html: `
-          html, body, #root { height: 100%; margin: 0; }
-          body { padding-bottom: env(safe-area-inset-bottom); box-sizing: border-box; }
+          html { height: 100dvh; }
+          body, #root { height: 100%; margin: 0; }
           input:focus, textarea:focus, [contenteditable]:focus { outline: none !important; box-shadow: none !important; }
         ` }} />
         <link rel="stylesheet" href="https://use.typekit.net/otb3sts.css" />
