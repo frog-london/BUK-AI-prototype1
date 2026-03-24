@@ -273,51 +273,76 @@ export function ActionCardSend({
         )}
 
         {/* Amount row */}
-        {displayStep === 'send' && !isEditMode ? (
+        {displayStep === 'send' && Platform.OS === 'web' ? (
+          /* Web: single persistent <input> that never unmounts between send/edit modes.
+             iOS closes the keyboard when the focused element is unmounted, so we keep
+             one raw <input> alive across both modes. */
+          <View style={isEditMode ? styles.amountRowEditWrap : styles.amountRowSpaced}>
+            {!isEditMode && (
+              <Animated.View needsOffscreenAlphaCompositing style={{ opacity: plusMinusOpacity }}>
+                <TouchableOpacity onPress={onDecrement} activeOpacity={0.7}>
+                  <IconMinusCircle width={31} height={31} />
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+            <View style={isEditMode ? styles.amountRowCenter : styles.amountTouchable}>
+              <Text style={[styles.amountCurrency, isEditMode && { color: '#5E649D' }]}>£</Text>
+              {isEditMode ? (
+                <Text style={styles.amountWhole} pointerEvents="none">
+                  <Text style={{ color: '#06015D' }}>{editWholePart}</Text>
+                  <Text style={{ color: typedDecCount > 0 ? '#06015D' : '#5E649D' }}>.</Text>
+                  <Text style={{ color: typedDecCount >= 1 ? '#06015D' : '#5E649D' }}>{editDec0}</Text>
+                  <Text style={{ color: typedDecCount >= 2 ? '#06015D' : '#5E649D' }}>{editDec1}</Text>
+                </Text>
+              ) : (
+                <Text style={styles.amountWhole}>{displayAmount}</Text>
+              )}
+            </View>
+            {!isEditMode && (
+              <Animated.View needsOffscreenAlphaCompositing style={{ opacity: plusMinusOpacity }}>
+                <TouchableOpacity onPress={onIncrement} activeOpacity={0.7}>
+                  <IconPlusCircle width={31} height={31} />
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+            {/* Persistent raw <input> — stays mounted across send/edit so iOS keeps keyboard open */}
+            <input
+              type="text"
+              inputMode="decimal"
+              value={editValue}
+              onChange={(e: any) => handleChangeText(e.target.value)}
+              onFocus={() => { if (!isEditMode) onAmountPress?.(); }}
+              onBlur={() => handleBlur()}
+              style={{
+                position: 'absolute',
+                top: 0, left: 0, right: 0, bottom: 0,
+                width: '100%', height: '100%',
+                color: 'transparent',
+                WebkitTextFillColor: 'transparent',
+                border: 'none',
+                background: 'transparent',
+                fontSize: '16px',
+                caretColor: isEditMode ? '#06015D' : 'transparent',
+                outline: 'none',
+                zIndex: 10,
+              }}
+            />
+          </View>
+        ) : displayStep === 'send' && !isEditMode ? (
           <View style={styles.amountRowSpaced}>
             <Animated.View needsOffscreenAlphaCompositing style={{ opacity: plusMinusOpacity }}>
               <TouchableOpacity onPress={onDecrement} activeOpacity={0.7}>
                 <IconMinusCircle width={31} height={31} />
               </TouchableOpacity>
             </Animated.View>
-            {Platform.OS === 'web' ? (
-              <View style={styles.amountTouchable}>
-                <Text style={styles.amountCurrency}>£</Text>
-                <Text style={styles.amountWhole}>{displayAmount}</Text>
-                {/* Raw HTML <input> so iOS sees a direct native tap and opens the keyboard.
-                    RNW's TextInput wraps the native input with touch handling that breaks
-                    the user gesture chain required by iOS to trigger the keyboard. */}
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={editValue}
-                  onChange={(e: any) => handleChangeText(e.target.value)}
-                  onFocus={() => onAmountPress?.()}
-                  onBlur={() => handleBlur()}
-                  style={{
-                    position: 'absolute',
-                    top: 0, left: 0, right: 0, bottom: 0,
-                    width: '100%', height: '100%',
-                    color: 'transparent',
-                    WebkitTextFillColor: 'transparent',
-                    border: 'none',
-                    background: 'transparent',
-                    fontSize: '16px',
-                    caretColor: 'transparent',
-                    outline: 'none',
-                  }}
-                />
-              </View>
-            ) : (
-              <TouchableOpacity
-                onPress={onAmountPress}
-                activeOpacity={0.7}
-                style={styles.amountTouchable}
-              >
-                <Text style={styles.amountCurrency}>£</Text>
-                <Text style={styles.amountWhole}>{displayAmount}</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              onPress={onAmountPress}
+              activeOpacity={0.7}
+              style={styles.amountTouchable}
+            >
+              <Text style={styles.amountCurrency}>£</Text>
+              <Text style={styles.amountWhole}>{displayAmount}</Text>
+            </TouchableOpacity>
             <Animated.View needsOffscreenAlphaCompositing style={{ opacity: plusMinusOpacity }}>
               <TouchableOpacity onPress={onIncrement} activeOpacity={0.7}>
                 <IconPlusCircle width={31} height={31} />
